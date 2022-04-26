@@ -14,6 +14,9 @@ struct ContentView: View {
 //    入力された文字列を保持する状態変数, @State:状態変数として設定(データを書き換えられる)
     @State var inputText = ""
     
+//    SafariViewの表示有無を管理する変数
+    @State var showSafari = false
+    
     var body: some View {
         VStack {
 //            $Stateで宣言した状態変数に$をつけることで、状態変数の値を参照渡しする
@@ -29,8 +32,45 @@ struct ContentView: View {
                 .submitLabel(.search)
 //              上下左右に余白
                 .padding()
-        }
-    }
+            
+    //            リスト表示する
+                List(okashiDataList.okashiList) { okashi in
+    //                1つ1つの要素が取り出させれる
+                    
+    //                ボタンを用意する
+                    Button(action: {
+    //                  Safariviewを表示する
+                        showSafari.toggle()
+                    }) {
+    //                    Listの表示内容を生成する
+    //                水平にレイアウト(横方向にレイアウト)
+                      HStack {
+    //                    画像読み込み、表示する
+                      AsyncImage(url: okashi.image) { image in
+    //                        画像を表示する
+                          image
+    //                        リサイズする
+                              .resizable()
+                              .aspectRatio(contentMode: .fit)
+    //                        高さ40
+                              .frame(height: 40)
+                      } placeholder: {
+    //                        読み込み中はインジケーターを表示する
+                          ProgressView()
+                      }
+    //                    テキストを表示する
+                    Text(okashi.name)
+                  }  //HStack ここまで
+                } // Button ここまで
+                .sheet(isPresented: self.$showSafari, content: {
+//                        SafariViewを表示する
+                    SafariView(url: okashi.link)
+//                        画面下部がセーフエリア外までいっぱいになるように指定
+                        .edgesIgnoringSafeArea(.bottom)
+                }) // sheetここまで
+            } // List ここまで
+        } // VStack ここまで
+    } // body ここまで
 }
 
 struct ContentView_Previews: PreviewProvider {
